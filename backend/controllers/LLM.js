@@ -464,20 +464,21 @@ const analysis = async (req, res) => {
     a.patientId=patientId;
     a.file=fileId;
     a.valuesFromReport=jsonObject;
-    if (jsonObject['date']) {
-        console.log(jsonObject['date']);
-        const str = jsonObject['date'];
-        try{
-            let date=new Date(
-                str.slice(6, 10) + '/' + str.slice(3, 5) + '/' + str.slice(0, 2)
-            );
-            a.dateOfReport=date;
-        }catch(e){
-            a.dateOfReport = new Date();
-        } 
-    } else {
-        a.dateOfReport = new Date();
-    }
+    a.dateOfReport = new Date();
+    // if (jsonObject['date']) {
+    //     console.log(jsonObject['date']);
+    //     const str = jsonObject['date'];
+    //     try{
+    //         let date=new Date(
+    //             str.slice(6, 10) + '/' + str.slice(3, 5) + '/' + str.slice(0, 2)
+    //         );
+    //         a.dateOfReport=date;
+    //     }catch(e){
+    //         a.dateOfReport = new Date();
+    //     } 
+    // } else {
+    //     a.dateOfReport = new Date();
+    // }
     a.isVerified=false;
 
     await a.save();

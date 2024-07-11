@@ -5,6 +5,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import pdfjs from 'pdfjs-dist';
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
+import { UserIcon } from 'lucide-react'
 
 pdfjs.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
@@ -333,10 +334,9 @@ export default function Doctoranalysis() {
               <div className="flex p-4 @container">
                 <div className="flex w-full flex-col gap-4 @[520px]:flex-row @[520px]:justify-between @[520px]:items-start">
                   <div className="flex gap-4">
-                  <div
-                className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
-                style={{ backgroundImage: 'url("https://cdn.usegalileo.ai/stability/1c59f8b8-2f0d-4280-9e6d-75d6c0cee0d6.png")' }}
-              ></div>
+                  <div className="bg-gray-200 rounded-full w-32 h-32 flex items-center justify-center">
+                  <UserIcon className="text-gray-500 w-20 h-20" />
+                </div>
                     <div className="flex flex-col justify-center">
                       <p className="text-[#111418] text-[22px] font-bold leading-tight tracking-[-0.015em]">{pData.name}</p>
                       <p className="text-[#637588] text-base font-normal leading-normal">{pData.gender}, Age {calculateAge(pData.DOB)}</p>
@@ -413,7 +413,7 @@ export default function Doctoranalysis() {
                   style={{ height: precautionsHeight ? `${precautionsHeight + 20}px` : 'auto' }}
                 >
                   <div className="flex flex-col gap-1 flex-1">
-                    {isEditing ? (
+                    {(isEditing && !reportData.isVerified) ? (
                       <textarea
                         defaultValue={reportPrecautions.join("\n")}
                         className="border border-[#dce0e5] rounded-xl p-2 flex-1"
