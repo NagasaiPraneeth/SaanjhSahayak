@@ -4,6 +4,7 @@ import Navbar from './patient/Navbar';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import MedicalChatbot from './MedicalChatbot';
 
 export default function Main(props) {
     const [noofPatients, setNoofPatients] = useState(0);
@@ -24,6 +25,7 @@ export default function Main(props) {
 
             </div>
           </div>
+          <MedicalChatbot />
         </div>
       );
 }

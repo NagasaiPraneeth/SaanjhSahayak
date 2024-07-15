@@ -15,6 +15,7 @@ import Load from './components/Load';
 import CaretakerAnalysis from './components/CaretakerAnalysis';
 import EditForm from './components/EditForm';
 import ResultPopup from './ResultPopup';
+import MedicalChatbot from './components/MedicalChatbot';
 
 function App() {
   const [isDoctor, setIsDoctor] = useState(() => {
@@ -50,6 +51,7 @@ function App() {
           <Route path="/dummy" element={<Dummy />} />
           <Route path="/edit" element={<EditForm />} />
           <Route path="/result" element={<ResultPopup />} />
+          <Route path="/chatbot" element={<MedicalChatbot />} />
           
         </Routes>
       </Router>
