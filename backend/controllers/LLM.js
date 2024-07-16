@@ -230,7 +230,7 @@ const chatbot = async (req, res) => {
 
    
   
-  const apiKey = process.env.API_KEY_2;
+  const apiKey = process.env.API_KEY_3;
   const genAI = new GoogleGenerativeAI(apiKey);
   
   const model = genAI.getGenerativeModel({
