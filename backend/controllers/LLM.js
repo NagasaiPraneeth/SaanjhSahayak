@@ -37,9 +37,10 @@ const getParameters = async (req, res) => {
     const genAI = new GoogleGenerativeAI(apiKey);
 
     const model = genAI.getGenerativeModel({
-        model: 'gemini-1.5-pro',
+        model: 'gemini-1.5-flash',
         systemInstruction:
             'If input is not related to medical diagnosis must respond with only {\n"medicalQuery":"no"\n}',
+        safetySettings: safety_settings,
     });
     const generationConfig = {
         temperature: 0,
@@ -50,7 +51,6 @@ const getParameters = async (req, res) => {
     };
     const chatSession = model.startChat({
         generationConfig,
-        safety_settings,
         history: [
             {
                 role: 'user',
@@ -144,9 +144,11 @@ const analysis = async (req, res) => {
     const apiKey = process.env.API_KEY_2;
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({
-        model: 'gemini-1.5-pro',
+        model: 'gemini-1.5-flash',
+        safetySettings : safety_settings,
         systemInstruction:
             'you are a medical reports analyzer which analyze the reports and give output in a specific format where the  Keys are summary of analysis, Date of report , Precautions, Possible disease risks, severity rating out of 10, which specialist(one or less) is needed. the format of output should be in:  Short-Analysis:String,Precautions:Array,Possible-disease risks:Array,Severity:int,specialist:String as json format\n',
+         
     });
     jsonObject["chronic conditions"] = await patient.findOne({ _id: patientId }).select({ 'chronics': 1, '-_id': 1 });
     
@@ -159,7 +161,7 @@ const analysis = async (req, res) => {
     };
     const chatSession = model.startChat({
         generationConfig,
-        safety_settings,
+         
         history: [
             {
                 role: 'user',
@@ -234,7 +236,7 @@ const chatbot = async (req, res) => {
   const genAI = new GoogleGenerativeAI(apiKey);
   
   const model = genAI.getGenerativeModel({
-    model: "gemini-1.5-pro",
+    model: "gemini-1.5-flash",
     systemInstruction: "Respond only to medical questions with brief, accurate answers that fit in a standard chatbot window. Provide factual information based on established medical knowledge, focusing on symptoms, conditions, treatments, and general health advice. Do not offer personalized diagnoses or treatment plans. For non-medical queries or requests for alternative treatments, politely explain that you're a medical information chatbot and can't assist with those topics. Always encourage users to consult a healthcare professional for personalized medical advice, especially for serious concerns. Keep responses concise, clear, and easy to read.",
   });
   

@@ -221,7 +221,7 @@ export default function CaretakerAnalysis() {
   
 
   const handlePatient = (id) => {
-    navigate('/doctoranalysis', {
+    navigate('/caretakeranalysis', {
       replace: true,
       state: { id, pid: patientId, isDoctor: doctor, patientData: pData }
     });
