@@ -9,6 +9,8 @@ require('dotenv').config();
 
 const { Pdf} = require("./Schema");
 
+app.use(cors());
+
 const port = process.env.PORT;
 app.use(bodyParser.json({ limit: '100mb' }));
 
