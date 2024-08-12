@@ -28,17 +28,19 @@ export default function List(props) {
   };
 
   async function GetPatientList() {
-    const response = await axios.get('en/getpatients');
+   
+    const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/en/getpatients`);
     setPatients(response.data);
     props.setNoofPatients(response.data.length);
   }
 
   async function GetReportList() {
-    const response = await axios.get('en/getreports');
+    const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/en/getreports`);
     setReports(response.data);
   }
 
   useEffect(() => {
+    
     GetPatientList();
     GetReportList();
   }, []);
@@ -53,7 +55,7 @@ export default function List(props) {
   const handlePatient = (id, pid) => {
     return async () => {
       try {
-            const response = await axios.get(`/en/getpatient/${pid}`);
+            const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/en/getpatient/${pid}`);
             if (props.isDoctor) {
               navigate(`/doctoranalysis`, { state: { id: id, pid: pid, isDoctor: props.isDoctor, patientData: response.data } })
             }
@@ -71,9 +73,10 @@ export default function List(props) {
       
 
       try {
-        const response = await axios.get(`/en/getpatient/${id}`);
+        const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/en/getpatient/${id}`);
+
         console.log("editPatients", editPatients);
-      console.log("deletePatients", deletePatients);
+        console.log("deletePatients", deletePatients);
         if (!editPatients && !deletePatients) {
           try {
               navigate(`/patient`, { state: { id: id } })

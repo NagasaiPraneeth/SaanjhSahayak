@@ -27,7 +27,7 @@ const MedicalChatbot = () => {
     // Simulate a delay
     await new Promise(resolve => setTimeout(resolve, 1000));
 
-    const data=await axios.post('/en/chatbot',{input:input } );
+    const data=await axios.post(`${import.meta.env.VITE_BACKEND_URL}/en/chatbot`,{input:input } );
 
     let botResponse;
       botResponse = {

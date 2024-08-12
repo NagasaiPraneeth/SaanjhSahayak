@@ -22,13 +22,15 @@ function Profile(props) {
   const navigate = useNavigate();
 
   async function GetPatient() {
-    const response = await axios.get(`/en/getpatient/${patientId}`);
+    console.log("patient id is : "+patientId)
+    const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/en/getpatient/${patientId}`);
+    console.log(response.data);
     setPatientData(response.data);
   }
 
   async function getDates() {
     console.log("hi")
-    const response = await axios.get(`/en/getdates/${patientId}`);
+    const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/en/getdates/${patientId}`);
     setReportsDate(response.data)
   }
 
@@ -69,7 +71,7 @@ function Profile(props) {
 
         try {
           console.log("hi");
-          const reponse = await axios.post('/en/uploadpdf', { file: fileData, filename: filename, patientId: patientId, name: patientData.name });
+          const reponse = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/en/uploadpdf`, { file: fileData, filename: filename, patientId: patientId, name: patientData.name });
           if (reponse.data.data === false) {
 
             setIsOPen(false);
@@ -103,7 +105,7 @@ function Profile(props) {
 
     try {
       console.log("hi")
-      const response = await axios.get(`/en/pdfid/6687c7725a4889e9aac64ec2`, { responseType: 'arraybuffer' });
+      const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/en/pdfid/6687c7725a4889e9aac64ec2`, { responseType: 'arraybuffer' });
 
       const binaryData = new Uint8Array(response.data);
 

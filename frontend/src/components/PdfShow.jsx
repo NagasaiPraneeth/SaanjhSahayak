@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from "react-router-dom";
 import pdfjs from 'pdfjs-dist';
-import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
+//import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
 
-pdfjs.GlobalWorkerOptions.workerSrc = pdfjsWorker;
+//pdfjs.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
 export default function PdfShow() {
   const { state } = useLocation();

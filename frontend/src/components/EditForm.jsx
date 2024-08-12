@@ -84,7 +84,7 @@ export default function PatientRegistrationForm() {
       dateOfBirth: formData.dateOfBirth ? new Date(formData.dateOfBirth).toISOString() : null
     };
     
-    const response = await axios.post('/en/editPatient', {formDataToSend , patientId: patientData._id});
+    const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/en/editPatient`, {formDataToSend , patientId: patientData._id});
     console.log(response.data.data);
     setFormData({
       firstName: '',

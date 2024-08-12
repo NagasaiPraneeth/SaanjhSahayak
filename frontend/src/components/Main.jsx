@@ -8,10 +8,7 @@ import MedicalChatbot from './MedicalChatbot';
 
 export default function Main(props) {
     const [noofPatients, setNoofPatients] = useState(0);
-    const navigate = useNavigate();
-
-    
-    
+    const navigate = useNavigate();    
       return (
         <div
           className="relative flex size-full min-h-screen flex-col bg-[#f8fafb] group/design-root overflow-x-hidden"

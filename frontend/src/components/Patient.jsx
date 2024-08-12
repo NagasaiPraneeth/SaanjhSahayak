@@ -10,7 +10,7 @@ export default function Patient(props) {
     const {state} = useLocation();
     const { id }=state;    
     return (
-        <div className="relative flex size-full min-h-screen flex-col bg-slate-50 group/design-root overflow-x-hidden" style={{fontFamily: 'Manrope, "Noto Sans", sans-serif;'}}>
+        <div className="relative flex size-full min-h-screen flex-col bg-slate-50 group/design-root overflow-x-hidden" style={{fontFamily: 'Manrope, "Noto Sans", sans-serif'}}>
             <div className="layout-container flex h-full grow flex-col">
                 <Navbar patient={true} isDoctor={props.isDoctor}/>
                 <Profile isDoctor={props.isDoctor} id={id}/>

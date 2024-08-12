@@ -10,7 +10,7 @@ import NewSignin from './components/NewSignin';
 import Upload from './components/Upload';
 import PdfShow from './components/PdfShow';
 import Doctoranalysis from './components/doctor/Doctoranalysis';
-import Dummy from './components/patient/dummy';
+// import Dummy from './components/patient/dummy';
 import Load from './components/Load';
 import CaretakerAnalysis from './components/CaretakerAnalysis';
 import EditForm from './components/EditForm';
@@ -48,7 +48,6 @@ function App() {
           <Route path="/pdfShow" element={<PdfShow />} />
           <Route path="/doctoranalysis" element={<Doctoranalysis />} />
           <Route path="/caretakeranalysis" element={<CaretakerAnalysis />} />
-          <Route path="/dummy" element={<Dummy />} />
           <Route path="/edit" element={<EditForm />} />
           <Route path="/result" element={<ResultPopup />} />
           <Route path="/chatbot" element={<MedicalChatbot />} />

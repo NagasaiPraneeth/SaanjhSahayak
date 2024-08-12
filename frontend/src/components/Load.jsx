@@ -42,7 +42,7 @@ const Load = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
-            await axios.post(`/en/uploadpdf`, { file: file, filename: fileName });
+            await axios.post(`${import.meta.env.VITE_BACKEND_URL}/en/uploadpdf`, { file: file, filename: fileName });
             console.log("Successfully uploaded.");
         } catch (error) {
             console.log("Error uploading details:", error);
@@ -55,7 +55,7 @@ const Load = () => {
 
         try {
             console.log("hi")
-            const response = await axios.get(`/en/pdfid/66813196189877e17f54a9e0`, { responseType: 'arraybuffer' });
+            const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/en/pdfid/66813196189877e17f54a9e0`, { responseType: 'arraybuffer' });
             // console.log(response.data);
             const binaryData = new Uint8Array(response.data);
             //console.log(binaryData)

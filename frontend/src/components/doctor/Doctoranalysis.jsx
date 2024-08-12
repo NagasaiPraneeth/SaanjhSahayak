@@ -4,10 +4,10 @@ import { useLocation } from "react-router-dom";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import pdfjs from 'pdfjs-dist';
-import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
+//import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
 import { UserIcon } from 'lucide-react'
 
-pdfjs.GlobalWorkerOptions.workerSrc = pdfjsWorker;
+//pdfjs.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
 
 export default function Doctoranalysis() {
@@ -178,7 +178,7 @@ export default function Doctoranalysis() {
 
   async function getUrl() {
     try {
-      const response = await axios.get(`/en/pdfid/${reportData.file}`, { responseType: 'arraybuffer' });
+      const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/en/pdfid/${reportData.file}`, { responseType: 'arraybuffer' });
       const binaryData = new Uint8Array(response.data);
       const blob = new Blob([binaryData], { type: 'application/pdf' });
       let url = window.URL.createObjectURL(blob);
@@ -190,7 +190,8 @@ export default function Doctoranalysis() {
 
   async function getReport() {
     try {
-      const response = await axios.get(`/en/getreport/${reportId}`);
+      
+      const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/en/getreport/${reportId}`);
       setReportData(response.data);
       setReportPrecautions(response.data.precautions);
       setIsVerify(response.data.isVerified);
@@ -202,7 +203,7 @@ export default function Doctoranalysis() {
 
   async function getDates() {
     try {
-      const response = await axios.post(`/en/getprevreports`, { patientId, reportId });
+      const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/en/getprevreports`, { patientId, reportId });
       setReportsDate(response.data);
     } catch (error) {
       console.error("Error fetching dates:", error);
@@ -240,7 +241,7 @@ export default function Doctoranalysis() {
       setIsVerify(true);
       const updatedReportData = { ...reportData, isVerified: true };
       
-      const response = await axios.post('/en/saveprecautions', {
+      const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/en/saveprecautions`, {
         reportId,
         precautions: reportPrecautions,
         doctorNotes: advice,

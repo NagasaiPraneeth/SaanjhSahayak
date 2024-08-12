@@ -30,7 +30,7 @@ function Upload() {
     formData.append("file", file);
     console.log(title, file);
 
-    const result = await axios.post("/en/uploadpdf",formData,
+    const result = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/en/uploadpdf`,formData,
       {
         headers: { "Content-Type": "multipart/form-data" },
       }
