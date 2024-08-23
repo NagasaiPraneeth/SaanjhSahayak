@@ -3,11 +3,13 @@ import Editsvg from "./Editsvg";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import pdfjs from 'pdfjs-dist';
-//import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
 import { UserIcon } from 'lucide-react'
 
-//pdfjs.GlobalWorkerOptions.workerSrc = pdfjsWorker;
+
+import * as pdfjsLib from 'pdfjs-dist';
+import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
 
 export default function Doctoranalysis() {
@@ -36,22 +38,27 @@ export default function Doctoranalysis() {
 
 
 
-  useEffect(() => {
-    const loadPdf = async () => {
-      if (url) {
-        try {
-          const pdfData = await fetch(url).then((res) => res.arrayBuffer());
-          const pdf = await pdfjs.getDocument({ data: pdfData }).promise;
-          setPdfDocument(pdf);
-          renderPage(pdf, 1, canvasRef.current, 1);
-        } catch (error) {
-          console.error('Error loading PDF:', error);
-        }
-      }
-    };
 
-    loadPdf();
-  }, [url]);
+  useEffect(() => {
+    if (url && isPopupOpen) {
+      loadPdf();
+    }
+  }, [url, isPopupOpen]);
+
+ 
+  const loadPdf = async () => {
+    if (url) {
+      try {
+        const loadingTask = pdfjsLib.getDocument(url);
+        const pdf = await loadingTask.promise;
+        setPdfDocument(pdf);
+        renderAllPages(pdf);
+      } catch (error) {
+        console.error('Error loading PDF:', error);
+      }
+    }
+  };
+
 
   useEffect(() => {
     const handleResize = () => {
@@ -64,62 +71,38 @@ export default function Doctoranalysis() {
     return () => window.removeEventListener('resize', handleResize);
   }, [isPopupOpen, pdfDocument]);
 
-  const updateScale = async () => {
-    if (!pdfDocument || !containerRef.current) return;
+  const updateScale = () => {
+    if (!containerRef.current) return;
 
-    const page = await pdfDocument.getPage(1);
-    const viewport = page.getViewport({ scale: 1 });
     const containerWidth = containerRef.current.clientWidth;
-    const containerHeight = containerRef.current.clientHeight;
-
-    const widthScale = containerWidth / viewport.width;
-    const heightScale = containerHeight / viewport.height;
-    const newScale = Math.min(widthScale, heightScale) * 2;
-
+    const newScale = (containerWidth - 40) / 595; // Assuming A4 width (595 points)
     setScale(newScale);
-    renderAllPages(newScale);
+    renderAllPages(pdfDocument, newScale);
   };
 
-  const renderPage = async (pdf, pageNum, canvas, currentScale) => {
-    const page = await pdf.getPage(pageNum);
+  const renderPage = async (pdf, pageNumber, canvas, currentScale) => {
+    const page = await pdf.getPage(pageNumber);
     const viewport = page.getViewport({ scale: currentScale });
-    canvas.height = viewport.height * 2;
-    canvas.width = viewport.width * 2;
+    canvas.height = viewport.height;
+    canvas.width = viewport.width;
     const context = canvas.getContext('2d');
-    context.scale(2, 2);
 
     await page.render({
       canvasContext: context,
       viewport: viewport,
-      renderInteractiveForms: true,
-      canvasFactory: {
-        create: function (width, height) {
-          const canvas = document.createElement('canvas');
-          canvas.width = width * 2;
-          canvas.height = height * 2;
-          return canvas;
-        },
-        reset: function (canvasAndContext, width, height) {
-          canvasAndContext.canvas.width = width * 2;
-          canvasAndContext.canvas.height = height * 2;
-        },
-        destroy: function (canvasAndContext) {
-          // no-op
-        }
-      }
     });
   };
 
-  const renderAllPages = async (currentScale) => {
-    if (!pdfDocument || !popupContentRef.current) return;
+
+  const renderAllPages = async (pdf, currentScale = scale) => {
+    if (!pdf || !popupContentRef.current) return;
 
     popupContentRef.current.innerHTML = '';
-    for (let pageNum = 1; pageNum <= pdfDocument.numPages; pageNum++) {
+    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
       const canvas = document.createElement('canvas');
       canvas.style.width = '100%';
-      canvas.style.height = 'auto';
       canvas.style.marginBottom = '10px';
-      await renderPage(pdfDocument, pageNum, canvas, currentScale);
+      await renderPage(pdf, pageNum, canvas, currentScale);
       popupContentRef.current.appendChild(canvas);
     }
   };
@@ -356,30 +339,30 @@ export default function Doctoranalysis() {
               </div>
               <h3 className="text-[#111418] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Current Report</h3>
               {isPopupOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                  <div ref={containerRef} className="bg-white rounded-lg w-3/4 max-w-4xl h-5/6 flex flex-col">
-                    <div className="flex justify-between items-center p-4">
-                      <h2 className="text-xl font-bold">PDF Viewer</h2>
-                      <button
-                        onClick={closePopup}
-                        className="px-4 py-2 bg-red-500 text-white rounded"
-                      >
-                        Close
-                      </button>
-                    </div>
-                    <div
-                      ref={popupContentRef}
-                      className="flex-grow overflow-y-auto scrollbar-hide p-4"
-                      style={{
-                        msOverflowStyle: 'none',
-                        scrollbarWidth: 'none',
-                      }}
-                    >
-                      {/* PDF pages will be rendered here */}
-                    </div>
-                  </div>
-                </div>
-              )}
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div ref={containerRef} className="bg-white rounded-lg w-3/4 max-w-4xl h-5/6 flex flex-col">
+            <div className="flex justify-between items-center p-4">
+                <h2 className="text-xl font-bold">PDF Viewer</h2>
+                <button
+                    onClick={closePopup}
+                    className="px-4 py-2 bg-red-500 text-white rounded"
+                >
+                    Close
+                </button>
+            </div>
+            <div
+                ref={popupContentRef}
+                className="flex-grow overflow-y-auto scrollbar-hide p-4"
+                style={{
+                    msOverflowStyle: 'none',
+                    scrollbarWidth: 'none',
+                }}
+            >
+                {/* PDF pages will be rendered here */}
+            </div>
+        </div>
+    </div>
+      )}
               <div onClick={openPopup}
                 className="flex items-center gap-4 bg-white px-4 min-h-[72px] py-2 justify-between hover:bg-slate-100 hover:scale-105 transition transform duration-300">
                 <div className="flex items-center gap-4">
