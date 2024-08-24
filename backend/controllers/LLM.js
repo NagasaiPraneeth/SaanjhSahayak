@@ -3,6 +3,11 @@ const express = require('express');
 const fs = require('fs');
 const pdf = require('pdf-parse');
 const { report, patient } = require('../Schema.js');
+const bodyParser = require('body-parser');
+const app = express();
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 const {
     GoogleGenerativeAI,
     HarmCategory,
@@ -130,8 +135,8 @@ const getParameters = async (req, res) => {
 }
 
 const analysis = async (req, res) => {
-    const { fileId,  patientId,name } = req.body;
-    let {jsonObject}= req.body;
+    const { fileId, patientId, name } = req.body;
+    let { jsonObject } = req.body;
     let report1 = new report({});
     report1 = await report1.save();
     const id = report1._id;
@@ -145,13 +150,13 @@ const analysis = async (req, res) => {
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({
         model: 'gemini-1.5-flash',
-        safetySettings : safety_settings,
+        safetySettings: safety_settings,
         systemInstruction:
             'you are a medical reports analyzer which analyze the reports and give output in a specific format where the  Keys are summary of analysis, Date of report , Precautions, Possible disease risks, severity rating out of 10, which specialist(one or less) is needed. the format of output should be in:  Short-Analysis:String,Precautions:Array,Possible-disease risks:Array,Severity:int,specialist:String as json format\n',
-         
+
     });
     jsonObject["chronic conditions"] = await patient.findOne({ _id: patientId }).select({ 'chronics': 1, '-_id': 1 });
-    
+
     const generationConfig = {
         temperature: 0,
         topP: 0.95,
@@ -161,7 +166,7 @@ const analysis = async (req, res) => {
     };
     const chatSession = model.startChat({
         generationConfig,
-         
+
         history: [
             {
                 role: 'user',
@@ -197,10 +202,10 @@ const analysis = async (req, res) => {
     a.possibleDiseases = analysisjson['Possible-disease risks'];
     a.severity = analysisjson['Severity'];
     a.specialistReq = analysisjson['specialist'];
-    a.patient=name;
-    a.patientId=patientId;
-    a.file=fileId;
-    a.valuesFromReport=jsonObject;
+    a.patient = name;
+    a.patientId = patientId;
+    a.file = fileId;
+    a.valuesFromReport = jsonObject;
     a.dateOfReport = new Date();
     // if (jsonObject['date']) {
     //     console.log(jsonObject['date']);
@@ -216,13 +221,13 @@ const analysis = async (req, res) => {
     // } else {
     //     a.dateOfReport = new Date();
     // }
-    a.isVerified=false;
+    a.isVerified = false;
 
     await a.save();
-    
-    
 
-    return res.json({data:true})
+
+
+    return res.json({ data: true })
 
 
 }
@@ -230,62 +235,128 @@ const chatbot = async (req, res) => {
     const { input } = req.body;
 
 
-   
-  
-  const apiKey = process.env.API_KEY_3;
-  const genAI = new GoogleGenerativeAI(apiKey);
-  
-  const model = genAI.getGenerativeModel({
-    model: "gemini-1.5-flash",
-    systemInstruction: "Respond only to medical questions with brief, accurate answers that fit in a standard chatbot window. Provide factual information based on established medical knowledge, focusing on symptoms, conditions, treatments, and general health advice. Do not offer personalized diagnoses or treatment plans. For non-medical queries or requests for alternative treatments, politely explain that you're a medical information chatbot and can't assist with those topics. Always encourage users to consult a healthcare professional for personalized medical advice, especially for serious concerns. Keep responses concise, clear, and easy to read.",
-  });
-  
-  const generationConfig = {
-    temperature: 1,
-    topP: 0.95,
-    topK: 64,
-    maxOutputTokens: 8192,
-    responseMimeType: "application/json",
-  };
-  
-  
-    const chatSession = model.startChat({
-      generationConfig,
-   // safetySettings: Adjust safety settings
-   // See https://ai.google.dev/gemini-api/docs/safety-settings
-      history: [
-        {
-          role: "user",
-          parts: [
-            {text: "hello my name is nagasai"},
-          ],
-        },
-        {
-          role: "model",
-          parts: [
-            {text: "Hello NagaSai! 👋 \n\nI'm glad you're here.  😊  Please remember, I can answer medical questions, but for personalized advice, always talk to a doctor. 🩺 \n \nWhat can I help you with today?  \n"},
-          ],
-        },
-        {
-          role: "user",
-          parts: [
-            {text: "can you tell me about exercise which are good for health"},
-          ],
-        },
-        {
-          role: "model",
-          parts: [
-            {text: "Regular exercise offers fantastic health benefits!  💪  \n\nSome great choices include:\n\n* **Cardio:** Brisk walking, running, swimming, cycling - strengthens your heart and lungs! \n* **Strength Training:** Lifting weights or using resistance bands - builds muscle and bone strength. \n* **Flexibility & Balance:** Yoga, Pilates, Tai Chi - improves flexibility, balance, and reduces risk of falls. \n\nIt's always a good idea to talk to your doctor before starting a new exercise routine. 😊 \n"},
-          ],
-        },
-      ],
+
+
+    const apiKey = process.env.API_KEY_3;
+    const genAI = new GoogleGenerativeAI(apiKey);
+
+    const model = genAI.getGenerativeModel({
+        model: "gemini-1.5-flash",
+        systemInstruction: "Respond only to medical questions with brief, accurate answers that fit in a standard chatbot window. Provide factual information based on established medical knowledge, focusing on symptoms, conditions, treatments, and general health advice. Do not offer personalized diagnoses or treatment plans. For non-medical queries or requests for alternative treatments, politely explain that you're a medical information chatbot and can't assist with those topics. Always encourage users to consult a healthcare professional for personalized medical advice, especially for serious concerns. Keep responses concise, clear, and easy to read.",
     });
-  
+
+    const generationConfig = {
+        temperature: 1,
+        topP: 0.95,
+        topK: 64,
+        maxOutputTokens: 8192,
+        responseMimeType: "application/json",
+    };
+
+
+    const chatSession = model.startChat({
+        generationConfig,
+        // safetySettings: Adjust safety settings
+        // See https://ai.google.dev/gemini-api/docs/safety-settings
+        history: [
+            {
+                role: "user",
+                parts: [
+                    { text: "hello my name is nagasai" },
+                ],
+            },
+            {
+                role: "model",
+                parts: [
+                    { text: "Hello NagaSai! 👋 \n\nI'm glad you're here.  😊  Please remember, I can answer medical questions, but for personalized advice, always talk to a doctor. 🩺 \n \nWhat can I help you with today?  \n" },
+                ],
+            },
+            {
+                role: "user",
+                parts: [
+                    { text: "can you tell me about exercise which are good for health" },
+                ],
+            },
+            {
+                role: "model",
+                parts: [
+                    { text: "Regular exercise offers fantastic health benefits!  💪  \n\nSome great choices include:\n\n* **Cardio:** Brisk walking, running, swimming, cycling - strengthens your heart and lungs! \n* **Strength Training:** Lifting weights or using resistance bands - builds muscle and bone strength. \n* **Flexibility & Balance:** Yoga, Pilates, Tai Chi - improves flexibility, balance, and reduces risk of falls. \n\nIt's always a good idea to talk to your doctor before starting a new exercise routine. 😊 \n" },
+                ],
+            },
+        ],
+    });
+
     const result = await chatSession.sendMessage(input ? input : "hi");
     const reply = JSON.parse(result.response.text());
-    res.json({data:reply.response})
+    res.json({ data: reply.response })
 };
 
+const getParametersImage = async (req, res) => {
+
+   
+
+    const apiKey = "AIzaSyCqX6XEJ9k1mGC0Q_BP_WblLxSomZrwPPE";
+    const genAI = new GoogleGenerativeAI(apiKey);
+
+    const model = genAI.getGenerativeModel({
+        model: "gemini-1.5-pro-exp-0801",
+        systemInstruction: "fetch the  test report  and you should give response as health parameter and it's value as key value pairs  and if it is invalid health report then give medicalQuery as false in response include all health parameters in response",
+    });
+
+    const generationConfig = {
+        temperature: 0,
+        topP: 0.95,
+        topK: 64,
+        maxOutputTokens: 8192,
+        responseMimeType: "application/json",
+      };
+
+
+    
+    const base64Image = req.body.fileData;
+    const mimeType = req.body.contentType;
+    try {
+        if (!base64Image && !mimeType) {
+            return res.status(404).json({ error: 'File not found' });
+        }
+
+
+
+        const chatSession = model.startChat({
+            generationConfig,
+            history: [
+                {
+                    role: "user",
+                    parts: [
+                        {
+                            inlineData: {
+                                mimeType: mimeType,
+                                data: base64Image
+                            }
+                        },
+                        { text: "the user will give you the  test report  and you should give response as health parameter and it's value as key value pair in a object and also fetch date and include in the output at first position." },
+                    ],
+                },
+                {
+                    role: 'model',
+                    parts: [
+                        {
+                            text: '```json\n{\n"medicalQuery":"yes",\n  "date": "24/03/2019",\n  "Uric Acid": "4.0 mg/dL",\n  "Urea": "16 mg/dL",\n  "Creatinine": "0.5 mg/dL",\n  "Sodium": "138 mmol/L",\n  "Potassium": "5.0 mmol/L",\n  "Chlorides": "101 mmol/L",\n  "Fasting Plasma Glucose": "201 mg/dL",\n  "2 hrs Post Lunch Plasma Glucose": "212 mg/dL",\n  "Haemoglobin": "11.2 g/dL",\n  "Total RBC Count": "4.38 millions/cumm",\n  "Packed Cell Volume / Hematocrit": "34.2 Vol%",\n  "MCV": "78.1 fl",\n  "MCH": "25.7 pg",\n  "MCHC": "32.9 gm/dL",\n  "RDW": "16.8 %",\n  "Total WBC Count": "6400 Cells/cumm",\n  "Neutrophils": "60 %",\n  "Lymphocytes": "28 %",\n  "Eosinophils": "2 %",\n  "Monocytes": "9 %",\n  "Basophils": "1 %",\n  "Absolute Neutrophil Count": "3900 Cells/cumm",\n  "Absolute Lymphocyte Count": "1800 Cells/cumm",\n  "Absolute Eosinophil Count": "100 Cells/cumm",\n  "Absolute Monocyte Count": "600 Cells/cumm",\n  "Platelet Count": "427000 /cumm",\n  "RBC": "Normocytic Normochromic with mild anisocytosis",\n  "WBC": "Normal in morphology,maturity and distribution",\n  "Platelets": "Adequate",\n  "Colour": "Pale Yellow",\n  "Appearance": "Clear",\n  "Specific Gravity": "1.010",\n  "Reaction/pH": "Alkaline (7.5)",\n  "Protein": "Nil",\n  "Glucose": "Nil",\n  "Urobilinogen": "Normal",\n  "Bilirubin": "Negative",\n  "Ketones": "Negative",\n  "Nitrites": "Negative",\n  "Pus Cells": "1-2/HPF",\n  "R.B.C": "Nil",\n  "Epithelial Cells": "1-2/HPF",\n  "Casts": "Nil",\n  "Crystals": "Nil",\n  "Serum Status": "Clear",\n  "Triglycerides": "212 mg/dL",\n  "Total Cholesterol": "161 mg/dL",\n  "LDL Cholesterol": "83 mg/dL",\n  "HDL Cholesterol": "36 mg/dL",\n  "VLDL": "42 mg/dL",\n  "Total Cholesterol/HDL Cholesterol Ratio": "4.47",\n  "LDL Cholesterol/HDL Cholesterol Ratio": "2.29",\n  "Glycosylated Haemoglobin": "8.3 %"\n}\n```',
+                        },
+                    ],
+                }
+            ],
+        });
+
+        const result = await chatSession.sendMessage("fetch the  test report  and you should give response as health parameter and it's value as key value pair");
+        res.json({parameters : result.response.text()})
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ error: 'An error occurred while processing the image' });
+    }
+
+
+}
 
 
 
@@ -298,4 +369,5 @@ const chatbot = async (req, res) => {
 
 
 
-module.exports = {getParameters, analysis,chatbot }
+
+module.exports = { getParameters, analysis, chatbot, getParametersImage }

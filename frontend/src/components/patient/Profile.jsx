@@ -22,7 +22,7 @@ function Profile(props) {
   const navigate = useNavigate();
 
   async function GetPatient() {
-    console.log("patient id is : "+patientId)
+    console.log("patient id is : " + patientId)
     const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/en/getpatient/${patientId}`);
     console.log(response.data);
     setPatientData(response.data);
@@ -68,10 +68,12 @@ function Profile(props) {
       reader.onloadend = async () => {
         const fileData = reader.result.split(',')[1]; // Get base64-encoded file data
         const filename = event.target.value.replace("C:\\fakepath\\", "");
+        const base64File = await fileToBase64(selectedFile);
+        console.log("base64File", base64File);
 
         try {
           console.log("hi");
-          const reponse = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/en/uploadpdf`, { file: fileData, filename: filename, patientId: patientId, name: patientData.name });
+          const reponse = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/en/uploadpdf`, { file: fileData, filename: filename, patientId: patientId, name: patientData.name, base64File: base64File });
           if (reponse.data.data === false) {
 
             setIsOPen(false);
@@ -96,7 +98,14 @@ function Profile(props) {
       console.log("No input file");
     }
   };
-
+  const fileToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (error) => reject(error);
+    });
+  };
 
 
 
@@ -215,6 +224,7 @@ function Profile(props) {
               id="file-upload"
               type="file"
               className="hidden"
+              accept=".pdf"
               onChange={handleFile}
             />
           </div>
