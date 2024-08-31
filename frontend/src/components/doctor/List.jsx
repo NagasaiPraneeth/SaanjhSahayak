@@ -111,6 +111,7 @@ export default function List(props) {
   const handlePatient = (id, pid) => {
     return async () => {
       try {
+    
             const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/en/getpatient/${pid}`);
             if (props.isDoctor) {
               navigate(`/doctoranalysis`, { state: { id: id, pid: pid, isDoctor: props.isDoctor, patientData: response.data } })
@@ -261,7 +262,7 @@ export default function List(props) {
               <div
                 key={index}
                 className="flex items-center gap-4 bg-[#f8fafb] px-4 min-h-[72px] py-2 mb-3 transition-all duration-300 ease-in-out hover:bg-[#e8edf3] cursor-pointer rounded-xl"
-                onClick={() => handlePatient(report._id, report.patientId)}
+                onClick={handlePatient(report._id, report.patientId)}
               >
                 <div className="bg-[#e8edf3] text-[#4f7396] font-bold rounded-full h-14 w-14 flex items-center justify-center">
                   R 
